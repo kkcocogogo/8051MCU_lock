@@ -1,4 +1,8 @@
-A 8051 MCU passcode lock project
+A 8051 MCU passcode lock project, read the .c file for more
 Tim Feirg, kkcocogogo@gmail.com
 
-this is my final project for my MCU course
+this is just a final project for my MCU course, I've included the MCU board design(including .pdf file and proteus design),
+as well as the 1602 LCD data sheet.
+
+I never learnt how to use github, and I don't know how to write markdown.
+if the code's terrible, please let me know.

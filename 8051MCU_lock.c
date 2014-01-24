@@ -1,7 +1,16 @@
 /* 
+
+Tim Feirg
+kkcocogogo@gmail.com
+
 feature:
-	optimized for portability and performance
-	keyboard_scan() function performance very stable
+
+	optimized for portability and performance, however if you're to use it for your own MCU board, there're several snippets of code that
+	you need to modify according to the particular 8051 board that you're using, they're enclosed with phrase "project-specific", make sure
+	that you locate them through out the file.
+
+	keyboard_scan() function is pretty stable
+
 further notice:
 
 	I never learn the true osc frequency of my current MCU board, I tried 12, 11.0592, and 10.969Mhz but they all failed to create a delay
@@ -9,11 +18,13 @@ further notice:
 
 	due to the flawed design of this TX-1C MCU board(check out TX-1C manual for more), keyboard inputs will affect lcd display, not a bug.
 	send_data() will just work, but may come with some glitches, haven't got time to redesign.
+
+	please let me know how bad my program is.
 */
 
 #include<reg52.h>
 #include<string.h>
-
+/*project-specific start*/
 #define keyboard_bus P3
 #define lcd_bus P0
 #define led_debug P1 // using led light for debugging purpose
@@ -26,8 +37,9 @@ sbit lcdrs=P3^5;// lcd data/command selection bit
 chip_select and segment_select*/
 sbit chip_select=P2^6;
 sbit segment_select=P2^7;
-
-/*the following declarations are fundamental functions/variables related to the MCU board I/O*/
+/*project-specific end*/
+/*the following declarations are fundamental functions/variables related to the MCU board I/O
+and are summoned pretty much everywhere*/
 void send_command(unsigned char);
 void send_data(unsigned char frDisplay_string[]);
 void delay_ms(unsigned char);
@@ -38,7 +50,9 @@ volatile unsigned char keyboard_scan();
 /*all functions related to password logic goes here*/
 void input(unsigned char password_temp[]); // input() captures user input and atores them in given array
 volatile bit compare(unsigned char password_temp1[],unsigned char password_temp2[]);
-unsigned char xdata password[password_length];// if you have battery-backed external RAM, password may be preserved after reset/power off
+/*if you have battery-backed external RAM, password may be preserved after reset/power off
+also, it'd be better if using pointer*/
+unsigned char xdata password[password_length];
 
 void main() {
 
@@ -166,12 +180,9 @@ void input(unsigned char password_temp[]) {
 				send_data("\aCLEARED!");
 				send_data("\nN-CLR Y-CONFIRM");
 				
-				case 0xff:// 0xff stands for null, maybe I should use \0 as null
-				password_counter--;
-				break;
-
 				default:
-				password_temp[password_counter]=keystroke;
+				/*it's necessary to prevent storing passwords in plaintext, but I don't know ways better than this Caesar cipher*/
+				password_temp[password_counter]=keystroke+1;
 				beep_ms(50);
 				break;
 			}
@@ -186,10 +197,12 @@ void initialize_MCU() {
 	/* initializing timer 0 */
 	EA=1;// enable interrupt
 	ET0=1;//enable timer 0 interrupt
+	/*project-specific start*/
 	TMOD=0x02;//set timer 0 to mode 2
 	TH0=0x49;
 	TL0=0x49;//set TL0 to 0x49=256-183
 	TR0=1;//starts timer 0
+	/*project-specific end*/
 	/* Oscillator frequency is 10.969MHz, that makes a 914083Hz system clock. 
 	Notice that 914083Hz/183 is 4994.99, So 5 overflows make up 1ms*/
 	
@@ -205,6 +218,7 @@ void initialize_MCU() {
 }
 
 /*send command according to 1602 manualL*/
+/*project-specific start*/
 void send_command(unsigned char command) {
 	lcdrs=0;
 	lcd_bus=command;
@@ -241,6 +255,7 @@ void send_data(unsigned char display_data[]) {
 		lcdrs=0;
 	}
 }
+/*project-specific end*/
 
 volatile unsigned char keyboard_scan() {
 
@@ -269,6 +284,7 @@ volatile unsigned char keyboard_scan() {
 				/*this function runs an infinite loop until keystroke agree with a proper return.
 				so as a single keyboard scan program you should put the definitions of the keys
 				that you're insterested below*/
+				/*project-specific start*/
 				case 0x10:return 7;
 				case 0x20:return 8;
 				case 0x40:return 9;
@@ -281,6 +297,7 @@ volatile unsigned char keyboard_scan() {
 				case 0xdc:return 2;
 				case 0xbc:return 3;
 				case 0xd8:return 0;
+				/*project-specific end*/
 				// case 0xe8:return 'n';// you don't want to mess with P3^4 and P3^5
 				// case 0xb8:return 'y';
 			}
