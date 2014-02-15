@@ -5,6 +5,6 @@ A 8051 MCU passcode lock project, read `8051MCU_lock.c` for more.
 This is just a final project for my MCU course, I've included the MCU board design(including .pdf file and proteus design), the flowchart for my program, as well as the 1602 LCD data sheet. [视频介绍](http://v.youku.com/v_show/id_XNjY2MDQxMTAw.html)
 
 ##The Flowchart
-![](https://github.com/kkcocogogo/8051MCU_lock/blob/master/MCU%20lock%20flowchart.png)
+![](https://raw2.github.com/kkcocogogo/8051MCU_lock/master/MCU%20lock%20flowchart.png)
 
 if the code's terrible, please let me know.
